@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.TimeZone;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.bruno.cursomc.domain.Categoria;
@@ -20,6 +21,7 @@ import com.bruno.cursomc.domain.PagamentoComCartao;
 import com.bruno.cursomc.domain.Pedido;
 import com.bruno.cursomc.domain.Produto;
 import com.bruno.cursomc.domain.enums.EstadoPagamento;
+import com.bruno.cursomc.domain.enums.Perfil;
 import com.bruno.cursomc.domain.enums.TipoCliente;
 import com.bruno.cursomc.repositories.CategoriaRepository;
 import com.bruno.cursomc.repositories.CidadeRepository;
@@ -34,6 +36,8 @@ import com.bruno.cursomc.repositories.ProdutoRepository;
 @Service
 public class DBService {
 
+	@Autowired
+	private BCryptPasswordEncoder pe;
 	@Autowired
 	private CategoriaRepository categoriaRepository;
 	@Autowired
@@ -110,17 +114,24 @@ public class DBService {
 		estadoRepository.save(Arrays.asList(est1, est2));
 		cidadeRepository.save(Arrays.asList(c1, c2, c3));
 
-		Cliente cli1 = new Cliente(null, "Maria Silva", "brunocleuc@gmail.com", "12345678910",
-			TipoCliente.PESSOAFISICA);
+		Cliente cli1 = new Cliente(null, "Maria Silva", "maria@gmail.com", "12345678910",
+			TipoCliente.PESSOAFISICA, pe.encode("123"));
 		cli1.getTelefones().addAll(Arrays.asList("798789797", "897897987"));
+
+		Cliente cli2 = new Cliente(null, "Bruno Não", "brunocleuc@gmail.com", "10987654321",
+			TipoCliente.PESSOAFISICA, pe.encode("123"));
+		cli2.addPerfil(Perfil.ADMIN);
+		cli2.getTelefones().addAll(Arrays.asList("999999999"));
 
 		Endereco e1 = new Endereco(null, "Rua Flores", "300", "Apto 303", "Jardim", "38220834", cli1, c1);
 		Endereco e2 = new Endereco(null, "Avenida Matos", "105", "Sala 800", "Centro", "38777012", cli1, c2);
+		Endereco e3 = new Endereco(null, "Avenida Matos", "105", null, "Centro", "38777012", cli2, c2);
 
 		cli1.getEnderecos().addAll(Arrays.asList(e1, e2));
+		cli2.getEnderecos().addAll(Arrays.asList(e3));
 
-		clienteRepository.save(Arrays.asList(cli1));
-		enderecoRepository.save(Arrays.asList(e1, e2));
+		clienteRepository.save(Arrays.asList(cli1, cli2));
+		enderecoRepository.save(Arrays.asList(e1, e2, e3));
 
 		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
 		sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
@@ -131,8 +142,8 @@ public class DBService {
 		Pagamento pagto1 = new PagamentoComCartao(null, EstadoPagamento.QUITADO, ped1, 6);
 		ped1.setPagamento(pagto1);
 
-		Pagamento pagto2 = new PagamentoComBoleto(null, EstadoPagamento.PENDENTE, ped2,
-			sdf.parse("20/10/2017 00:00"), null);
+		Pagamento pagto2 = new PagamentoComBoleto(null, EstadoPagamento.PENDENTE, ped2, sdf.parse("20/10/2017 00:00"),
+				null);
 		ped2.setPagamento(pagto2);
 
 		cli1.getPedidos().addAll(Arrays.asList(ped1, ped2));

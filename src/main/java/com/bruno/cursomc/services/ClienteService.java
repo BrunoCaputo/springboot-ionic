@@ -9,16 +9,20 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort.Direction;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.bruno.cursomc.domain.Cidade;
 import com.bruno.cursomc.domain.Cliente;
 import com.bruno.cursomc.domain.Endereco;
+import com.bruno.cursomc.domain.enums.Perfil;
 import com.bruno.cursomc.domain.enums.TipoCliente;
 import com.bruno.cursomc.dto.ClienteDTO;
 import com.bruno.cursomc.dto.ClienteNewDTO;
 import com.bruno.cursomc.repositories.ClienteRepository;
 import com.bruno.cursomc.repositories.EnderecoRepository;
+import com.bruno.cursomc.security.UserSS;
+import com.bruno.cursomc.services.exceptions.AuthorizationException;
 import com.bruno.cursomc.services.exceptions.DataIntegrityException;
 import com.bruno.cursomc.services.exceptions.ObjectNotFoundException;
 
@@ -26,11 +30,20 @@ import com.bruno.cursomc.services.exceptions.ObjectNotFoundException;
 public class ClienteService {
 
 	@Autowired
+	private BCryptPasswordEncoder pe;
+
+	@Autowired
 	private ClienteRepository repo;
 	@Autowired
 	private EnderecoRepository enderecoRepository;
 
 	public Cliente find(Integer id) {
+
+		UserSS user = UserService.authenticated();
+		if (user == null || !user.hasRole(Perfil.ADMIN) && !id.equals(user.getId())) {
+			throw new AuthorizationException("Acesso negado");
+		}
+
 		Cliente obj = repo.findOne(id);
 		if (obj == null) {
 			throw new ObjectNotFoundException(
@@ -72,12 +85,12 @@ public class ClienteService {
 	}
 
 	public Cliente fromDTO(ClienteDTO objDto) {
-		return new Cliente(objDto.getId(), objDto.getNome(), objDto.getEmail(), null, null);
+		return new Cliente(objDto.getId(), objDto.getNome(), objDto.getEmail(), null, null, null);
 	}
 
 	public Cliente fromDTO(ClienteNewDTO objDto) {
 		Cliente cli = new Cliente(null, objDto.getNome(), objDto.getEmail(), objDto.getCpfOuCnpj(),
-				TipoCliente.toEnum(objDto.getTipo()));
+				TipoCliente.toEnum(objDto.getTipo()), pe.encode(objDto.getSenha()));
 		Cidade cid = new Cidade(objDto.getCidadeId(), null, null);
 		Endereco end = new Endereco(null, objDto.getLogradouro(), objDto.getNumero(), objDto.getComplemento(),
 				objDto.getBairro(), objDto.getCep(), cli, cid);
