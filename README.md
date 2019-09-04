@@ -1,7 +1,7 @@
 # Spring Boot + Ionic
 Udemy Course by Nelio Alves
 
-Personal Repository for Spring project
+Personal Repository for Ionic frontend project
 
 Udemy URL
 ---------
