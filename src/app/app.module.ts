@@ -1,3 +1,4 @@
+import { CartService } from "./../services/domain/cart.service";
 import { AuthInterceptorProvider } from "./../interceptors/auth-interceptor";
 import { ClienteService } from "./../services/domain/cliente.service";
 import { StorageService } from "./../services/storage.service";
@@ -13,6 +14,7 @@ import { SplashScreen } from "@ionic-native/splash-screen";
 import { HttpClientModule } from "@angular/common/http";
 import { ErrorInterceptorProvider } from "../interceptors/error-interceptor";
 import { AuthService } from "../services/auth.service";
+import { ProdutoService } from "../services/domain/produto.service";
 
 @NgModule({
   declarations: [MyApp],
@@ -28,7 +30,9 @@ import { AuthService } from "../services/auth.service";
     ErrorInterceptorProvider,
     AuthService,
     StorageService,
-    ClienteService
+    ClienteService,
+    ProdutoService,
+    CartService
   ]
 })
 export class AppModule {}

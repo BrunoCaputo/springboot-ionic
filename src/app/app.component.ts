@@ -22,18 +22,16 @@ export class MyApp {
   ) {
     this.initializeApp();
 
-    // used for an example of ngFor and navigation
     this.pages = [
       { title: "Profile", component: "ProfilePage" },
       { title: "Categorias", component: "CategoriasPage" },
+      { title: "Carrinho", component: "CartPage" },
       { title: "Logout", component: "" }
     ];
   }
 
   initializeApp() {
     this.platform.ready().then(() => {
-      // Okay, so the platform is ready and our plugins are available.
-      // Here you can do any higher level native things you might need.
       this.statusBar.styleDefault();
       this.splashScreen.hide();
     });
