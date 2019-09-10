@@ -15,6 +15,7 @@ import { HttpClientModule } from "@angular/common/http";
 import { ErrorInterceptorProvider } from "../interceptors/error-interceptor";
 import { AuthService } from "../services/auth.service";
 import { ProdutoService } from "../services/domain/produto.service";
+import { ImageUtilService } from "../services/image-util.service";
 
 @NgModule({
   declarations: [MyApp],
@@ -32,7 +33,8 @@ import { ProdutoService } from "../services/domain/produto.service";
     StorageService,
     ClienteService,
     ProdutoService,
-    CartService
+    CartService,
+    ImageUtilService
   ]
 })
 export class AppModule {}
